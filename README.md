@@ -1,5 +1,8 @@
-# PKHeXPluginExample
+# Gen 9 Raid Pokemon BruteForcer 
 
-An example project that compiles a .dll compatible with [PKHeX](https://github.com/kwsch/PKHeX)'s plugin loader.
+This plugin for pkhex can generate legal pokemon in raids for pokemon S/V 
 
-To ensure the plugin loads correctly, be sure to rename the assembly, namespace, and class name of your new plugin such that they are unique to other plugins you may end up loading.
+## Usage 
+
+Make a folder called plugins in the Pkhex folder and put the dll in it. 
+The menu should appear in tools when pkhex is relaunched
