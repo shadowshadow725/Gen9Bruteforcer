@@ -10,9 +10,9 @@ using PKHeX.Core;
 
 namespace Gen9PokemonBurteForcer
 {
-    public class ExamplePlugin : IPlugin
+    public class Gen9RaidPokemonBurteForcer : IPlugin
     {
-        public string Name => nameof(ExamplePlugin);
+        public string Name => nameof(Gen9RaidPokemonBurteForcer);
         public int Priority => 170; // Loading order, lowest is first.
 
         // Initialized on plugin load
@@ -70,7 +70,7 @@ namespace Gen9PokemonBurteForcer
             var ctrl = new ToolStripMenuItem(Name);
             tools.DropDownItems.Add(ctrl);
 
-            var c2 = new ToolStripMenuItem($"{Name} Open settings");
+            var c2 = new ToolStripMenuItem($"{Name} settings");
             c2.Click += (s, e) => generateForm();
             // var c3 = new ToolStripMenuItem($"{Name} show message");
             // c3.Click += (s, e) => MessageBox.Show("Hello!");
