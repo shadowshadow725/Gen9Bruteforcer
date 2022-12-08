@@ -46,6 +46,9 @@ namespace Gen9PokemonBurteForcer
         TextBox species = new TextBox();
 
         Label iterations = new Label();
+        TextBox ThreadCount = new TextBox();
+        int[] Itercounts;
+        String SearcherStatus;
 
         public void Initialize(params object[] args)
         {
@@ -92,13 +95,21 @@ namespace Gen9PokemonBurteForcer
 
             var sav = SaveFileEditor.SAV;
 
-            Thread thread = new Thread(Bruteforcer);
-            thread.Start();
-
+            Thread [] threads = new Thread[Int32.Parse(ThreadCount.Text)];
+            Itercounts = new int[Int32.Parse(ThreadCount.Text)];
+            SearcherStatus = "running";
+            for (int i = 0; i < threads.Length; i++)
+            {
+                threads[i] = new Thread(Bruteforcer);
+                threads[i].Start(i);
+            }
+            
+       
         }
 
-        private void Bruteforcer()
+        private void Bruteforcer(object i)
         {
+            int threadnumber = (int)i;
             var sav = SaveFileEditor.SAV;
             var tr = TrainerInfo;
             EncounterCriteria ec = new EncounterCriteria();
@@ -113,23 +124,37 @@ namespace Gen9PokemonBurteForcer
                 }
                
             }
-
-            pk = (PK9)es.ConvertToPKM(tr, ec);
-            int Searchcount = 0;
-            while (!PKMcheck(pk))
+            
+            PK9 pkl = (PK9)es.ConvertToPKM(tr, ec);
+            Itercounts[threadnumber] = 0;
+            while (!PKMcheck(pkl))
             {
-                pk = (PK9)es.ConvertToPKM(tr, ec);
-                Searchcount++;
-                iterations.Text = Searchcount.ToString() + " seeds searched";
-                
-                iterations.Update();
+                pkl = (PK9)es.ConvertToPKM(tr, ec);
+                Itercounts[threadnumber]++;
+                if (threadnumber == 0)
+                {
+                    iterations.Text = Itercounts.Sum().ToString() + " seeds searched";
+                    iterations.Update();
+                }
+                if (SearcherStatus == "done")
+                {
+                    return;
+                }
+
             }
+            
+            SearcherStatus = "done";
+            pk = pkl;
             sav.ModifyBoxes(ModifyPKM, 0, 0);
             SaveFileEditor.ReloadSlots();
         }
 
         private bool PKMcheck(PKM target)
         {
+            if (SHINY.Checked && target.IsShiny != SHINY.Checked)
+                return false;
+            if (target.Nature != Int32.Parse(Nature.Text) && Int32.Parse(Nature.Text) != 25)
+                return false;
             if (target == null)
                 return false;
             if (target.IV_ATK != Int32.Parse(ATK.Text) && ATKc.Checked)
@@ -144,10 +169,8 @@ namespace Gen9PokemonBurteForcer
                 return false;
             if (target.IV_SPE != Int32.Parse(SPE.Text) && SPEc.Checked)
                 return false;
-            if (target.Nature != Int32.Parse(Nature.Text) && Int32.Parse(Nature.Text) != 25)
-                return false;
-            if(SHINY.Checked && target.IsShiny != SHINY.Checked)
-                return false;
+            
+            
             return true;
 
         }
@@ -290,6 +313,10 @@ namespace Gen9PokemonBurteForcer
 
         public void generateForm()
         {
+
+            formui.MinimizeBox = true;
+           
+
             SaveFile sav = SaveFileEditor.SAV; // current savefile
 
             List<Control> formControls = new List<Control>();
@@ -333,9 +360,16 @@ namespace Gen9PokemonBurteForcer
             
             SHINY.Location = new System.Drawing.Point(25, 180);
             formControls.Add(SHINY);
-
-
-
+            formControls.Add(new Label
+            {
+                Location = new System.Drawing.Point(10, 215),
+                AutoSize = true,
+                Text = "Thread Count",
+                Font = new System.Drawing.Font(Control.DefaultFont, System.Drawing.FontStyle.Bold)
+            });
+            ThreadCount.Location = new System.Drawing.Point(10, 235);
+            ThreadCount.Text = "1";
+            formControls.Add(ThreadCount);
 
             formControls.Add(new Label
             {
@@ -431,6 +465,8 @@ namespace Gen9PokemonBurteForcer
             iterations.Text = "0 seeds searched";
             iterations.AutoSize= true;
             iterations.Location = new System.Drawing.Point(80, 410);
+            
+
             formControls.Add(iterations);
             formControls.Add(createButton);
 
