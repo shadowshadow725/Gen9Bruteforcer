@@ -40,9 +40,12 @@ namespace Gen9PokemonBurteForcer
         CheckBox SPAc = new CheckBox();
         CheckBox SPDc = new CheckBox();
         CheckBox SPEc = new CheckBox();
+        CheckBox SHINY = new CheckBox();    
 
         TextBox Nature = new TextBox();
         TextBox species = new TextBox();
+
+        Label iterations = new Label();
 
         public void Initialize(params object[] args)
         {
@@ -112,10 +115,14 @@ namespace Gen9PokemonBurteForcer
             }
 
             pk = (PK9)es.ConvertToPKM(tr, ec);
-           
+            int Searchcount = 0;
             while (!PKMcheck(pk))
             {
                 pk = (PK9)es.ConvertToPKM(tr, ec);
+                Searchcount++;
+                iterations.Text = Searchcount.ToString() + " seeds searched";
+                
+                iterations.Update();
             }
             sav.ModifyBoxes(ModifyPKM, 0, 0);
             SaveFileEditor.ReloadSlots();
@@ -138,6 +145,8 @@ namespace Gen9PokemonBurteForcer
             if (target.IV_SPE != Int32.Parse(SPE.Text) && SPEc.Checked)
                 return false;
             if (target.Nature != Int32.Parse(Nature.Text) && Int32.Parse(Nature.Text) != 25)
+                return false;
+            if(SHINY.Checked && target.IsShiny != SHINY.Checked)
                 return false;
             return true;
 
@@ -312,6 +321,22 @@ namespace Gen9PokemonBurteForcer
             Nature.Text = "25";
             Nature.Location = new System.Drawing.Point(10, 125);
             formControls.Add(Nature);
+
+
+            formControls.Add(new Label
+            {
+                Location = new System.Drawing.Point(10, 160),
+                AutoSize = true,
+                Text = "Shiny?",
+                Font = new System.Drawing.Font(Control.DefaultFont, System.Drawing.FontStyle.Bold)
+            });
+            
+            SHINY.Location = new System.Drawing.Point(25, 180);
+            formControls.Add(SHINY);
+
+
+
+
             formControls.Add(new Label
             {
                 Location = new System.Drawing.Point(170, 10),
@@ -403,7 +428,10 @@ namespace Gen9PokemonBurteForcer
             createButton.Size = new System.Drawing.Size(185, 20);
             createButton.Location = new System.Drawing.Point(80, 300);
             createButton.Click += new EventHandler(startbuttoonclick);
-
+            iterations.Text = "0 seeds searched";
+            iterations.AutoSize= true;
+            iterations.Location = new System.Drawing.Point(80, 410);
+            formControls.Add(iterations);
             formControls.Add(createButton);
 
             formControls.Add(new Label
